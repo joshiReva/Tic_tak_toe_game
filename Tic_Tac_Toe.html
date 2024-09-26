@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+
+    <style>
+        body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f8ff;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 400px;
+    margin: auto;
+}
+
+h1 {
+    color: #333;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.cell {
+    background-color: #ffcc00;
+    border-radius: 8px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.cell:hover {
+    background-color: #ffa500;
+}
+
+.cell.x {
+    color: #ff4500;
+}
+
+.cell.o {
+    color: #008cba;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #008cba;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #005f75;
+}
+
+.status {
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+    .game-board {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .cell {
+        height: 80px;
+        font-size: 30px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tic Tac Toe</h1>
+        <div class="game-board" id="gameBoard"></div>
+        <button id="restartButton">Restart Game</button>
+        <p id="status" class="status"></p>
+    </div>
+
+
+
+<script>
+    const gameBoard = document.getElementById('gameBoard');
+const restartButton = document.getElementById('restartButton');
+const statusDisplay = document.getElementById('status');
+
+let board = ['', '', '', '', '', '', '', '', ''];
+let currentPlayer = 'X';
+let isGameActive = true;
+
+const winningConditions = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+];
+
+function createBoard() {
+    board.forEach((_, index) => {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.setAttribute('data-cell-index', index);
+        cell.addEventListener('click', handleCellClick);
+        gameBoard.appendChild(cell);
+    });
+}
+
+function handleCellClick(event) {
+    const clickedCell = event.target;
+    const cellIndex = clickedCell.getAttribute('data-cell-index');
+
+    if (board[cellIndex] !== '' || !isGameActive) {
+        return;
+    }
+
+    board[cellIndex] = currentPlayer;
+    clickedCell.classList.add(currentPlayer);
+    clickedCell.innerText = currentPlayer;
+
+    checkResult();
+}
+
+function checkResult() {
+    let roundWon = false;
+
+    for (let i = 0; i < winningConditions.length; i++) {
+        const [a, b, c] = winningConditions[i];
+        if (board[a] === '' || board[b] === '' || board[c] === '') {
+            continue;
+        }
+        if (board[a] === board[b] && board[a] === board[c]) {
+            roundWon = true;
+            break;
+        }
+    }
+
+    if (roundWon) {
+        statusDisplay.innerText = `Player ${currentPlayer} Wins! 🎉`;
+        isGameActive = false;
+        return;
+    }
+
+    if (!board.includes('')) {
+        statusDisplay.innerText = `It's a Draw! 🤝`;
+        isGameActive = false;
+        return;
+    }
+
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    statusDisplay.innerText = `Player ${currentPlayer}'s Turn`;
+}
+
+function restartGame() {
+    isGameActive = true;
+    currentPlayer = 'X';
+    board = ['', '', '', '', '', '', '', '', ''];
+    statusDisplay.innerText = `Player ${currentPlayer}'s Turn`;
+
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.innerText = '';
+        cell.classList.remove('X', 'O');
+    });
+}
+
+restartButton.addEventListener('click', restartGame);
+
+createBoard();
+statusDisplay.innerText = `Player ${currentPlayer}'s Turn`;
+
+</script>
+</body>
+</html>
